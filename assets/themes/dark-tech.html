@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ name }} — {{ title }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0c10;
+      --bg-elev: #11141a;
+      --fg: #e6edf3;
+      --muted: #8b949e;
+      --rule: #1f242c;
+      --accent: #7ee787;
+      --accent-2: #58a6ff;
+      --warn: #f0883e;
+      --mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+      --sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      background-image:
+        radial-gradient(circle at 20% 0%, rgba(126, 231, 135, 0.06), transparent 50%),
+        radial-gradient(circle at 80% 100%, rgba(88, 166, 255, 0.05), transparent 50%);
+      background-attachment: fixed;
+    }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 64px 24px; }
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--bg-elev);
+      border: 1px solid var(--rule);
+      border-bottom: none;
+      border-radius: 8px 8px 0 0;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .terminal-bar .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.r { background: #ff5f56; }
+    .dot.y { background: #ffbd2e; }
+    .dot.g { background: #27c93f; }
+    .terminal-bar .path { margin-left: 8px; }
+    header {
+      padding: 40px 32px;
+      background: var(--bg-elev);
+      border: 1px solid var(--rule);
+      border-radius: 0 0 8px 8px;
+      margin-bottom: 56px;
+    }
+    .prompt-line { font-family: var(--mono); font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+    .prompt-line .accent { color: var(--accent); }
+    .prompt-line .accent2 { color: var(--accent-2); }
+    h1 {
+      font-size: clamp(34px, 5vw, 48px);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .role-line { font-family: var(--mono); font-size: 14px; color: var(--accent); margin-bottom: 24px; }
+    .role-line .muted { color: var(--muted); }
+    .value-prop { font-size: 18px; line-height: 1.5; color: var(--fg); max-width: 600px; margin-bottom: 28px; }
+    .ctas { display: flex; gap: 10px; flex-wrap: wrap; }
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-family: var(--mono);
+      font-weight: 500;
+      font-size: 13px;
+      transition: all 0.15s ease;
+      border: 1px solid var(--rule);
+    }
+    .cta::before { content: "$"; color: var(--accent); }
+    .cta-primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .cta-primary::before { color: var(--bg); }
+    .cta-secondary { background: transparent; color: var(--fg); }
+    .cta:hover { transform: translateY(-1px); border-color: var(--accent); }
+    section { margin-bottom: 56px; }
+    h2 {
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+    h2::before { content: "// "; color: var(--muted); }
+    .about p { font-size: 16px; line-height: 1.7; color: var(--fg); max-width: 680px; }
+    .timeline-item {
+      padding: 20px 24px;
+      background: var(--bg-elev);
+      border: 1px solid var(--rule);
+      border-left: 3px solid var(--accent);
+      border-radius: 4px;
+      margin-bottom: 12px;
+      transition: border-left-color 0.2s ease;
+    }
+    .timeline-item:hover { border-left-color: var(--accent-2); }
+    .timeline-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+    .timeline-title { font-size: 17px; font-weight: 600; color: var(--fg); }
+    .timeline-dates { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+    .timeline-company { font-family: var(--mono); font-size: 13px; color: var(--accent-2); margin-bottom: 14px; }
+    .timeline-bullets { list-style: none; padding: 0; }
+    .timeline-bullets li {
+      padding-left: 20px;
+      position: relative;
+      margin-bottom: 6px;
+      font-size: 14px;
+      color: var(--fg);
+    }
+    .timeline-bullets li::before {
+      content: ">";
+      position: absolute;
+      left: 0;
+      font-family: var(--mono);
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .tech-row {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--rule);
+    }
+    .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+    .skill-cat {
+      padding: 18px;
+      background: var(--bg-elev);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+    }
+    .skill-cat-title {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .skill-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+    .skill-pill {
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 4px 10px;
+      background: rgba(126, 231, 135, 0.08);
+      color: var(--fg);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+    }
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .project-card {
+      padding: 20px;
+      background: var(--bg-elev);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+    .project-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .project-name { font-size: 16px; font-weight: 600; margin-bottom: 6px; color: var(--fg); }
+    .project-desc { font-size: 14px; color: var(--muted); margin-bottom: 14px; min-height: 42px; }
+    .project-tech { font-family: var(--mono); font-size: 11px; color: var(--accent); margin-bottom: 12px; }
+    .project-links { display: flex; gap: 12px; }
+    .project-links a {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent-2);
+      text-decoration: none;
+    }
+    .project-links a:hover { text-decoration: underline; }
+    .writing-list { list-style: none; padding: 0; }
+    .writing-list li {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .writing-list a { color: var(--fg); text-decoration: none; font-size: 15px; }
+    .writing-list a:hover { color: var(--accent); }
+    .writing-venue { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+    footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--rule);
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--muted);
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    @media (max-width: 600px) {
+      .wrap { padding: 32px 16px; }
+      header { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <div class="terminal-bar">
+      <span class="dot r"></span>
+      <span class="dot y"></span>
+      <span class="dot g"></span>
+      <span class="path">~/{{ name_handle }} — zsh</span>
+    </div>
+
+    <header>
+      <!-- ADD: professional headshot here if available -->
+      <p class="prompt-line"><span class="accent">$</span> whoami</p>
+      <h1>{{ name }}</h1>
+      <p class="role-line">→ {{ title }} <span class="muted">@</span> {{ location }}</p>
+      <p class="value-prop">{{ value_prop }}</p>
+      <div class="ctas">
+        <a class="cta cta-primary" href="resume.md">resume</a>
+        {{ cta_github }}
+        {{ cta_linkedin }}
+        {{ cta_email }}
+      </div>
+    </header>
+
+    <section class="about">
+      <h2>about</h2>
+      <p>{{ bio }}</p>
+    </section>
+
+    <section>
+      <h2>experience</h2>
+      {{ experience_items }}
+    </section>
+
+    <section>
+      <h2>stack</h2>
+      <div class="skills-grid">
+        {{ skills_blocks }}
+      </div>
+    </section>
+
+    <section>
+      <h2>projects</h2>
+      <div class="projects-grid">
+        {{ project_cards }}
+      </div>
+    </section>
+
+    {{ writing_section }}
+
+    <footer>
+      <p><span style="color: var(--accent);">$</span> contact --email {{ email }}</p>
+      <p style="margin-top: 8px;">{{ footer_links }}</p>
+    </footer>
+
+  </div>
+</body>
+</html>
