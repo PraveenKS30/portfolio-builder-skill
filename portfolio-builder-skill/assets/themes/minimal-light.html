@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ name }} — {{ title }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --fg: #1a1a1a;
+      --muted: #6b6b6b;
+      --rule: #e6e3dc;
+      --accent: #b04a2f;
+      --serif: "Fraunces", Georgia, serif;
+      --sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 80px 32px; }
+    header { padding-bottom: 48px; border-bottom: 1px solid var(--rule); margin-bottom: 56px; }
+    h1 {
+      font-family: var(--serif);
+      font-weight: 600;
+      font-size: clamp(36px, 6vw, 56px);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .role { font-size: 18px; color: var(--muted); margin-bottom: 24px; }
+    .role .accent { color: var(--accent); }
+    .value-prop {
+      font-family: var(--serif);
+      font-size: 22px;
+      line-height: 1.4;
+      max-width: 600px;
+      margin-bottom: 32px;
+    }
+    .ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+    .cta {
+      display: inline-block;
+      padding: 10px 18px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 14px;
+      transition: transform 0.15s ease;
+    }
+    .cta-primary { background: var(--fg); color: var(--bg); }
+    .cta-secondary { border: 1px solid var(--rule); color: var(--fg); }
+    .cta:hover { transform: translateY(-1px); }
+    section { margin-bottom: 64px; }
+    h2 {
+      font-family: var(--serif);
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+    .about p { font-size: 18px; line-height: 1.7; max-width: 620px; }
+    .about p + p { margin-top: 16px; }
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 24px;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .timeline-item:last-child { border-bottom: none; }
+    .timeline-dates { font-size: 13px; color: var(--muted); padding-top: 4px; }
+    .timeline-title { font-family: var(--serif); font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+    .timeline-company { color: var(--muted); margin-bottom: 12px; font-size: 14px; }
+    .timeline-bullets { list-style: none; padding: 0; }
+    .timeline-bullets li {
+      padding-left: 18px;
+      position: relative;
+      margin-bottom: 6px;
+      font-size: 15px;
+    }
+    .timeline-bullets li::before {
+      content: "—";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+    .tech-row { font-size: 13px; color: var(--muted); margin-top: 12px; }
+    .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+    .skill-cat-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px; }
+    .skill-list { font-family: var(--serif); font-size: 17px; line-height: 1.6; }
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .project-card {
+      padding: 24px;
+      background: white;
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      transition: border-color 0.2s ease;
+    }
+    .project-card:hover { border-color: var(--accent); }
+    .project-name { font-family: var(--serif); font-size: 19px; font-weight: 600; margin-bottom: 8px; }
+    .project-desc { font-size: 14px; color: var(--muted); margin-bottom: 16px; min-height: 44px; }
+    .project-tech { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+    .project-links { display: flex; gap: 12px; }
+    .project-links a { font-size: 13px; color: var(--accent); text-decoration: none; }
+    .project-links a:hover { text-decoration: underline; }
+    .writing-list { list-style: none; padding: 0; }
+    .writing-list li { padding: 14px 0; border-bottom: 1px solid var(--rule); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .writing-list a { color: var(--fg); text-decoration: none; font-family: var(--serif); font-size: 17px; }
+    .writing-list a:hover { color: var(--accent); }
+    .writing-venue { font-size: 13px; color: var(--muted); }
+    footer {
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 1px solid var(--rule);
+      font-size: 14px;
+      color: var(--muted);
+    }
+    footer a { color: var(--fg); text-decoration: none; }
+    footer a:hover { color: var(--accent); }
+    @media (max-width: 600px) {
+      .wrap { padding: 48px 20px; }
+      .timeline-item { grid-template-columns: 1fr; gap: 8px; }
+      .skills-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header>
+      <!-- ADD: professional headshot here if available -->
+      <h1>{{ name }}</h1>
+      <p class="role">{{ title }} <span class="accent">·</span> {{ location }}</p>
+      <p class="value-prop">{{ value_prop }}</p>
+      <div class="ctas">
+        <a class="cta cta-primary" href="resume.md">Resume</a>
+        {{ cta_github }}
+        {{ cta_linkedin }}
+        {{ cta_email }}
+      </div>
+    </header>
+
+    <section class="about">
+      <h2>About</h2>
+      <p>{{ bio }}</p>
+    </section>
+
+    <section>
+      <h2>Experience</h2>
+      <div class="timeline">
+        {{ experience_items }}
+      </div>
+    </section>
+
+    <section>
+      <h2>Skills</h2>
+      <div class="skills-grid">
+        {{ skills_blocks }}
+      </div>
+    </section>
+
+    <section>
+      <h2>Projects</h2>
+      <div class="projects-grid">
+        {{ project_cards }}
+      </div>
+    </section>
+
+    {{ writing_section }}
+
+    <footer>
+      <p>{{ name }} · {{ email }}</p>
+      <p style="margin-top: 8px;">{{ footer_links }}</p>
+    </footer>
+
+  </div>
+</body>
+</html>
