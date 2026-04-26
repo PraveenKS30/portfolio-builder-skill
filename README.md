@@ -1,6 +1,6 @@
 # Portfolio-Builder-SKILL
 
-A Claude skill that turns your reference materials — LinkedIn, existing resume, GitHub, social links, raw notes — into a polished single-file HTML portfolio website and a matching Markdown resume.
+An Agent SKILL that turns your reference materials — LinkedIn, existing resume, GitHub, social links, raw notes — into a polished single-file HTML portfolio website and a matching Markdown resume.
 
 Three theme options. No fabrication. Built-in gap analysis that flags weak bullets and missing pieces instead of papering over them.
 
