@@ -1,6 +1,7 @@
 ---
 name: portfolio-builder
-description: Build a personal portfolio website and matching resume from a person's reference materials (LinkedIn, existing resume, GitHub, social links, raw notes). Use this skill whenever the user wants to create, generate, build, or refresh a portfolio site, personal website, dev portfolio, designer portfolio, or wants to turn their LinkedIn/resume/GitHub into a portfolio. Also use when the user wants to write or rewrite their resume from existing background info, asks for a "personal site," "portfolio," "developer site," or wants help packaging their professional identity. The skill produces a single-file HTML portfolio (in one of three themes: minimal-light, dark-tech, or creative-bold) plus a Markdown resume the user can edit. Trigger even when the user only mentions one of the inputs (e.g. "make a portfolio from my LinkedIn") or only one of the outputs (e.g. "rewrite my resume").
+description: |
+  Build a personal portfolio website and matching resume from a person's reference materials (LinkedIn, existing resume, GitHub, social links, raw notes).
 ---
 
 # Portfolio Builder
