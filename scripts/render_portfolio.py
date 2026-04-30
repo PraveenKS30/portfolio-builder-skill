@@ -42,7 +42,14 @@ def e(s):
 def cta(label, href, kind="cta-secondary"):
     if not href:
         return ""
-    return f'<a class="cta {kind}" href="{e(href)}">{e(label)}</a>'
+    extra = "" if href.startswith("mailto:") else ' target="_blank" rel="noopener"'
+    return f'<a class="cta {kind}" href="{e(href)}"{extra}>{e(label)}</a>'
+
+
+def display_url(url):
+    if not url:
+        return ""
+    return re.sub(r"^https?://", "", str(url)).rstrip("/")
 
 
 # ---------- portfolio rendering ----------
@@ -118,7 +125,8 @@ def render_project_cards(projects, theme):
     if not projects:
         return "<!-- ADD: projects -->"
     parts = []
-    for p in projects:
+    ordered_projects = sorted(projects, key=lambda p: not bool(p.get("highlight")))
+    for p in ordered_projects:
         tech = ", ".join(p.get("tech") or [])
         links = []
         if p.get("link"):
@@ -127,8 +135,9 @@ def render_project_cards(projects, theme):
             links.append(f'<a href="{e(p["repo"])}" target="_blank" rel="noopener">code →</a>')
         links_html = " ".join(links) or "<!-- ADD: live link or repo -->"
         tech_html = f'<div class="project-tech">{e(tech)}</div>' if tech else ""
+        featured = " featured" if p.get("highlight") else ""
         parts.append(f"""
-<div class="project-card">
+<div class="project-card{featured}">
   <div class="project-name">{e(p.get('name', ''))}</div>
   <div class="project-desc">{e(p.get('description', ''))}</div>
   {tech_html}
@@ -156,18 +165,61 @@ def render_writing_section(writing, theme):
 
 def render_footer_links(links):
     pieces = []
-    if links.get("github"):
-        pieces.append(f'<a href="{e(links["github"])}">github</a>')
-    if links.get("linkedin"):
-        pieces.append(f'<a href="{e(links["linkedin"])}">linkedin</a>')
-    if links.get("twitter"):
-        pieces.append(f'<a href="{e(links["twitter"])}">twitter</a>')
-    if links.get("website"):
-        pieces.append(f'<a href="{e(links["website"])}">website</a>')
+    for key, label in [
+        ("github", "github"),
+        ("linkedin", "linkedin"),
+        ("twitter", "twitter"),
+        ("youtube", "youtube"),
+        ("medium", "medium"),
+        ("website", "website"),
+    ]:
+        if links.get(key):
+            pieces.append(f'<a href="{e(links[key])}" target="_blank" rel="noopener">{label}</a>')
     for other in links.get("other", []) or []:
         if other.get("url"):
-            pieces.append(f'<a href="{e(other["url"])}">{e(other.get("label", "link"))}</a>')
+            pieces.append(f'<a href="{e(other["url"])}" target="_blank" rel="noopener">{e(other.get("label", "link"))}</a>')
     return " · ".join(pieces) or "<!-- ADD: social links -->"
+
+
+def render_headshot(identity):
+    url = identity.get("headshot_url")
+    if not url:
+        return "<!-- ADD: professional headshot here if available -->"
+    alt = identity.get("name") or "Professional headshot"
+    return f'<img class="headshot" src="{e(url)}" alt="{e(alt)}" />'
+
+
+def render_social_proof_section(social_proof, theme):
+    if not social_proof:
+        return ""
+
+    items = []
+    followers = social_proof.get("followers") or {}
+    for network, count in followers.items():
+        items.append(e(f"{count} followers on {network}"))
+    for talk in social_proof.get("speaking") or []:
+        items.append(e(talk))
+    for press in social_proof.get("press") or []:
+        outlet = press.get("outlet", "")
+        title = press.get("title", "")
+        label = " - ".join(filter(None, [outlet, title]))
+        if press.get("link"):
+            label = f'<a href="{e(press["link"])}" target="_blank" rel="noopener">{e(label or press["link"])}</a>'
+        else:
+            label = e(label)
+        items.append(label)
+
+    if not items:
+        return ""
+
+    heading_num = '<span class="num">05</span>' if theme == "creative-bold" else ""
+    rendered = "".join(f"<li>{item}</li>" for item in items)
+    return f"""
+<section>
+  <h2>{heading_num}Proof</h2>
+  <ul class="proof-list">{rendered}</ul>
+</section>
+"""
 
 
 def render_portfolio(profile, theme, template_path):
@@ -185,6 +237,7 @@ def render_portfolio(profile, theme, template_path):
     cta_linkedin = cta("LinkedIn", links.get("linkedin"))
     email = links.get("email", "")
     cta_email = cta("Email", f"mailto:{email}") if email else ""
+    location = identity.get("location", "")
 
     replacements = {
         "{{ name }}": e(name) or "<!-- ADD: full name -->",
@@ -192,16 +245,18 @@ def render_portfolio(profile, theme, template_path):
         "{{ name_last }}": e(name_last),
         "{{ name_handle }}": e(name_handle),
         "{{ title }}": e(identity.get("title", "")) or "<!-- ADD: professional title -->",
-        "{{ location }}": e(identity.get("location", "")) or "Remote",
-        "{{ value_prop }}": e(identity.get("value_prop", "")) or "<!-- ADD: 1-2 sentence value proposition -->",
+        "{{ location }}": e(location) or "<!-- ADD: location -->",
+        "{{ value_prop }}": e(identity.get("value_prop", "") or identity.get("headline", "")) or "<!-- ADD: 1-2 sentence value proposition -->",
         "{{ bio }}": e(identity.get("bio", "")) or "<!-- ADD: 3-4 sentence about-me bio -->",
         "{{ email }}": e(email) or "<!-- ADD: contact email -->",
+        "{{ headshot }}": render_headshot(identity),
         "{{ cta_github }}": cta_github,
         "{{ cta_linkedin }}": cta_linkedin,
         "{{ cta_email }}": cta_email,
         "{{ experience_items }}": render_experience_items(profile.get("experience", []), theme),
         "{{ skills_blocks }}": render_skills_blocks(profile.get("skills", {}), theme),
         "{{ project_cards }}": render_project_cards(profile.get("projects", []), theme),
+        "{{ social_proof_section }}": render_social_proof_section(profile.get("social_proof", {}), theme),
         "{{ writing_section }}": render_writing_section(profile.get("writing", []), theme),
         "{{ footer_links }}": render_footer_links(links),
     }
@@ -209,6 +264,9 @@ def render_portfolio(profile, theme, template_path):
     out = template
     for token, value in replacements.items():
         out = out.replace(token, value)
+    unreplaced = sorted(set(re.findall(r"{{\s*[^}]+\s*}}", out)))
+    if unreplaced:
+        raise ValueError(f"Unreplaced template tokens: {', '.join(unreplaced)}")
     return out
 
 
@@ -232,6 +290,15 @@ def render_resume(profile):
         contact_parts.append(links["linkedin"])
     if links.get("website"):
         contact_parts.append(links["website"])
+    if links.get("twitter"):
+        contact_parts.append(links["twitter"])
+    if links.get("youtube"):
+        contact_parts.append(links["youtube"])
+    if links.get("medium"):
+        contact_parts.append(links["medium"])
+    for other in links.get("other", []) or []:
+        if other.get("url"):
+            contact_parts.append(other["url"])
 
     lines = []
     lines.append(f"# {name}")
@@ -303,11 +370,12 @@ def render_resume(profile):
     if projects:
         lines.append("## Projects")
         lines.append("")
-        for p in projects:
+        ordered_projects = sorted(projects, key=lambda p: not bool(p.get("highlight")))
+        for p in ordered_projects:
             link = p.get("link") or p.get("repo") or ""
             heading = f"### {p.get('name', '')}"
             if link:
-                heading = f"### {p.get('name', '')} — [{link}]({link})"
+                heading = f"### {p.get('name', '')} — [{display_url(link)}]({link})"
             lines.append(heading)
             if p.get("description"):
                 lines.append(p["description"])
@@ -338,6 +406,20 @@ def render_resume(profile):
         lines.append("")
         for c in certs:
             lines.append(f"- {c.get('name', '')} — {c.get('issuer', '')}, {c.get('year', '')}")
+        lines.append("")
+
+    social_proof = profile.get("social_proof") or {}
+    proof_lines = []
+    for network, count in (social_proof.get("followers") or {}).items():
+        proof_lines.append(f"{count} followers on {network}")
+    proof_lines.extend(social_proof.get("speaking") or [])
+    for press in social_proof.get("press") or []:
+        proof_lines.append(" - ".join(filter(None, [press.get("outlet", ""), press.get("title", "")])))
+    if proof_lines:
+        lines.append("## Social Proof")
+        lines.append("")
+        for item in proof_lines:
+            lines.append(f"- {item}")
         lines.append("")
 
     return "\n".join(lines)
